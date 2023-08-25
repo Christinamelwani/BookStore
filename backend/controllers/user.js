@@ -26,20 +26,20 @@ class UserController {
 
       const user = await User.findOne({ where: { email } });
       if (!user) {
-        throw { message: "Email or password is incorrect!" };
+        throw { name: "Email or password is incorrect" };
       }
 
       const passwordMatches = compareHash(password, user.password);
 
       if (!passwordMatches) {
-        throw { message: "Email or password is incorrect!" };
+        throw { name: "Email or password is incorrect" };
       }
 
       const token = createToken({ username: user.username, email: user.email });
 
-      res.status(200).json({ status: 201, data: token });
+      res.status(200).json({ status: 201, access_token: token });
     } catch (err) {
-      console.log(err);
+      next(err);
     }
   }
 }
