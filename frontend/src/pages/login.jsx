@@ -39,7 +39,6 @@ export default function Login() {
         });
       }
     } catch (error) {
-      console.error("An error occurred while sending user data:", error);
       Swal.fire({
         title: "Error",
         text: "An unexpected error occurred",
