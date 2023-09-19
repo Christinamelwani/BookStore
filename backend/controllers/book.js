@@ -21,7 +21,7 @@ class BookController {
   }
   static async getAll(req, res, next) {
     try {
-      const books = await Book.findAll();
+      const books = await Book.findAll({ order: ["id"] });
       res.status(200).json({ status: 200, data: books });
     } catch (err) {
       next(err);

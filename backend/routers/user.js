@@ -5,9 +5,7 @@ const userRouter = express.Router();
 // define the home page route
 
 //Validate user and return user data:
-userRouter.get("/", (req, res) => {
-  res.send("Kena!");
-});
+userRouter.get("/", UserController.sendData);
 
 //Login and register:
 userRouter.post("/register", UserController.register);

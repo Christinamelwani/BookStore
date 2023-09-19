@@ -1,8 +1,16 @@
 const { User } = require("../models");
 const { hashPassword, compareHash } = require("../helpers/bcrypt");
-const { createToken } = require("../helpers/jwt");
+const { createToken, unloadToken } = require("../helpers/jwt");
 
 class UserController {
+  static async sendData(req, res, next) {
+    const { access_token } = req.headers;
+
+    const payload = unloadToken(access_token);
+
+    res.status(200).json({ status: 200, data: payload });
+  }
+
   static async register(req, res, next) {
     try {
       const { username, password, email, isAdmin } = req.body;
@@ -35,9 +43,14 @@ class UserController {
         throw { name: "Email or password is incorrect" };
       }
 
-      const token = createToken({ username: user.username, email: user.email });
+      const token = createToken({
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        isAdmin: user.isAdmin,
+      });
 
-      res.status(200).json({ status: 201, access_token: token });
+      res.status(200).json({ status: 200, access_token: token });
     } catch (err) {
       next(err);
     }
