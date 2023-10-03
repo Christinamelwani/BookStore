@@ -31,7 +31,7 @@ class CartController {
       next(err);
     }
   }
-  static async RemoveBookFromCart(req, res, next) {
+  static async removeBookFromCart(req, res, next) {
     const userId = unloadToken(req.headers.access_token).id;
     const bookId = req.params.id;
 
@@ -56,7 +56,7 @@ class CartController {
 
     res.status(200).json({ status: 200, data: deleted });
   }
-  static async GetAllBooksInCart(req, res, next) {
+  static async getAllBooksInCart(req, res, next) {
     try {
       let books = [];
 
@@ -72,6 +72,21 @@ class CartController {
       }
 
       res.status(200).json({ status: 200, data: books });
+    } catch (err) {
+      next(err);
+    }
+  }
+  static async emptyCart(req, res, next) {
+    try {
+      const userId = unloadToken(req.headers.access_token).id;
+
+      let cart = await Cart.findOne({ where: { UserId: userId } });
+
+      const deleted = await CartBook.destroy({
+        where: { CartId: cart.id },
+      });
+
+      res.status(200).json({ status: 200, data: deleted });
     } catch (err) {
       next(err);
     }

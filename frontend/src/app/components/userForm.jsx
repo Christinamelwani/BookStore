@@ -60,6 +60,20 @@ export default function UserForm({ mode, onSubmit }) {
               placeholder="Password"
               onChange={handleChange}
             />
+            {mode === "Register" ? (
+              <div className="flex gap-2 cursor-pointer">
+                <input
+                  className="cursor-pointer"
+                  name="isAdmin"
+                  id="isAdmin"
+                  type="checkbox"
+                  onChange={handleChange}
+                ></input>
+                <label className="cursor-pointer" for="isAdmin">
+                  Register as admin?
+                </label>
+              </div>
+            ) : null}
           </div>
           <div className="flex flex-col items-end">
             <SubmitButton text={mode} onSubmit={handleSubmit} />

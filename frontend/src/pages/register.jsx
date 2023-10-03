@@ -2,13 +2,14 @@ import React from "react";
 import UserForm from "@/app/components/userForm";
 import Swal from "sweetalert2";
 import Head from "next/head";
-
-const API_URL = "http://localhost:3000/user/register";
+import { useRouter } from "next/router";
 
 export default function Register() {
+  const router = useRouter();
+
   async function submitRegisterForm(userData) {
     try {
-      const response = await fetch(API_URL, {
+      const response = await fetch("http://localhost:3000/user/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -22,6 +23,19 @@ export default function Register() {
           text: "Successfully registered",
           icon: "success",
         });
+
+        const loginResponse = await fetch("http://localhost:3000/user/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(userData),
+        });
+
+        const data = await loginResponse.json();
+        localStorage.setItem("access_token", data.access_token);
+
+        router.push("/");
       } else {
         const errorData = await response.json();
         Swal.fire({

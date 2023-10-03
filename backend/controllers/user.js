@@ -4,11 +4,21 @@ const { createToken, unloadToken } = require("../helpers/jwt");
 
 class UserController {
   static async sendData(req, res, next) {
-    const { access_token } = req.headers;
+    try {
+      const { access_token } = req.headers;
 
-    const payload = unloadToken(access_token);
+      const payload = unloadToken(access_token);
 
-    res.status(200).json({ status: 200, data: payload });
+      const user = await User.findByPk(payload.id);
+
+      if (!user) {
+        throw { message: "User not found!" };
+      }
+
+      res.status(200).json({ status: 200, data: user });
+    } catch (err) {
+      next(err);
+    }
   }
 
   static async register(req, res, next) {
@@ -47,7 +57,6 @@ class UserController {
         id: user.id,
         username: user.username,
         email: user.email,
-        isAdmin: user.isAdmin,
       });
 
       res.status(200).json({ status: 200, access_token: token });
