@@ -71,32 +71,43 @@ export default function Cart() {
   }, []);
 
   return (
-    <div className="p-8 bg-gradient-to-b from-blue-100 to-blue-300 min-h-screen">
+    <div className="p-4 lg:p-8 bg-gradient-to-b from-blue-100 to-blue-300 min-h-screen">
       <Navbar headerText="Cart" link="/" linkText="Back to Dashboard" />
-      <div className="flex flex-col items-center gap-4">
+      <div className="flex flex-col items-center space-y-4">
         {cart.map((book) => (
-          <div key={book.id} className="bg-white w-96 p-4 rounded-lg shadow-md">
-            <div className="flex justify-between items-center">
+          <div
+            key={book.id}
+            className="bg-white w-full lg:w-[40%] p-4 rounded-lg shadow-md"
+          >
+            <div className="flex flex-col lg:flex-row justify-between items-center">
               <div>
                 <h2 className="text-lg font-semibold">{book.title}</h2>
                 <p className="text-gray-500">{book.author}</p>
-                <p className="text-blue-500">
-                  Total price: Rp {book.price * book.count}
-                </p>
               </div>
-              <div>No: {book.count}</div>
+              <div className="lg:text-blue-500">
+                Total price:{" "}
+                {new Intl.NumberFormat("id-ID", {
+                  style: "currency",
+                  currency: "IDR",
+                }).format(book.price * book.count)}
+              </div>
             </div>
+            <div className="text-blue-500">Quantity: {book.count}</div>
           </div>
         ))}
-        <div className="bg-white w-96 p-4 rounded-lg shadow-md">
+        <div className="bg-white w-full lg:w-[40%] p-4 rounded-lg shadow-md">
           <div className="flex justify-between items-center">
             <div className="flex items-center">
               <h2 className="text-lg font-semibold">Total price:</h2>
-              <p className="text-blue-500 ml-2">
-                Rp
-                {cart.reduce(
-                  (total, book) => (total += book.price * book.count),
-                  0
+              <p className="lg:text-blue-500 ml-2">
+                {new Intl.NumberFormat("id-ID", {
+                  style: "currency",
+                  currency: "IDR",
+                }).format(
+                  cart.reduce(
+                    (total, book) => (total += book.price * book.count),
+                    0
+                  )
                 )}
               </p>
             </div>
@@ -108,7 +119,7 @@ export default function Cart() {
                 Checkout Cart
               </button>
             ) : (
-              <div>Nothing in your cart yet</div>
+              <div className="text-blue-500">Nothing in your cart yet</div>
             )}
           </div>
         </div>

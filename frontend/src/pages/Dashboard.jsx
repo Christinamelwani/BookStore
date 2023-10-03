@@ -9,63 +9,35 @@ function Dashboard() {
   const [user, setUser] = useState([]);
   const [cart, setCart] = useState([]);
 
-  const API_URL = "http://localhost:3000/book";
+  const API_URL = "http://localhost:3000";
 
-  async function fetchBooks() {
+  async function fetchData(url, setStateFunc) {
     try {
-      const response = await fetch(API_URL);
-      const data = await response.json();
-      setBooks(data.data);
-    } catch (error) {
-      console.error("Error fetching books:", error);
-    }
-  }
-
-  async function fetchUser() {
-    try {
-      const response = await fetch("http://localhost:3000/user", {
+      const response = await fetch(url, {
         headers: { access_token: localStorage.getItem("access_token") },
       });
       const data = await response.json();
-      setUser(data.data);
+      setStateFunc(data.data);
     } catch (error) {
-      console.error("Error fetching user data:", error);
-    }
-  }
-
-  async function fetchCart() {
-    try {
-      const response = await fetch("http://localhost:3000/cart", {
-        headers: { access_token: localStorage.getItem("access_token") },
-      });
-      const data = await response.json();
-      setCart(data.data);
-    } catch (error) {
-      console.error("Error fetching user data:", error);
+      console.error(`Error fetching data from ${url}:`, error);
     }
   }
 
   useEffect(() => {
-    fetchBooks();
-    fetchUser();
-    fetchCart();
+    fetchData(`${API_URL}/book`, setBooks);
+    fetchData(`${API_URL}/user`, setUser);
+    fetchData(`${API_URL}/cart`, setCart);
   }, []);
+
+  const isAdmin = user.isAdmin;
 
   return (
     <div className="p-8 bg-gradient-to-b from-blue-100 to-blue-300 min-h-screen">
-      {user.isAdmin ? (
-        <Navbar
-          headerText="Admin Dashboard"
-          link="/addBook"
-          linkText="Add Book"
-        />
-      ) : (
-        <Navbar
-          headerText="Dashboard"
-          link="/cart"
-          linkText="View Cart"
-        ></Navbar>
-      )}
+      <Navbar
+        headerText={isAdmin ? "Admin Dashboard" : "Dashboard"}
+        link={isAdmin ? "/addBook" : "/cart"}
+        linkText={isAdmin ? "Add Book" : "View Cart"}
+      />
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {books.map((book) => (
           <div
@@ -79,32 +51,32 @@ function Dashboard() {
                 className="object-cover rounded-lg h-[20rem] w-[15rem]"
               />
             </div>
-            <h2
-              className="text-lg font-semibold mb-1"
-              style={{
-                maxWidth: "20rem",
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-              }}
-            >
+            <h2 className="text-lg font-semibold mb-1 max-w-[15rem] lg:max-w-[20rem] whitespace-nowrap overflow-hidden overflow-ellipsis">
               {book.title}
             </h2>
             <p className="text-gray-600">{book.author}</p>
             <p className="text-gray-500 text-sm mt-1">{book.description}</p>
             <p className="text-blue-500 mt-1">{book.category}</p>
             <div className="mt-2 flex gap-10 justify-between items-center">
-              <p className="text-blue-600 font-semibold">Rp. {book.price}</p>
+              <p className="text-blue-600 font-semibold">
+                {new Intl.NumberFormat("id-ID", {
+                  style: "currency",
+                  currency: "IDR",
+                }).format(book.price)}
+              </p>
               <p className="text-gray-600">Stock: {book.stock}</p>
             </div>
-            {user.isAdmin ? (
-              <AdminControls book={book} fetchBooks={fetchBooks} />
+            {isAdmin ? (
+              <AdminControls
+                book={book}
+                fetchBooks={() => fetchData(`${API_URL}/book`, setBooks)}
+              />
             ) : (
               <BookCounter
                 book={book}
                 cart={cart}
-                fetchBooks={fetchBooks}
-                fetchCart={fetchCart}
+                fetchBooks={() => fetchData(`${API_URL}/book`, setBooks)}
+                fetchCart={() => fetchData(`${API_URL}/cart`, setCart)}
               />
             )}
           </div>
