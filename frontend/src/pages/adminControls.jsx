@@ -1,6 +1,8 @@
+import { useRouter } from "next/router";
 import Swal from "sweetalert2";
 
 export default function AdminControls({ book, fetchBooks }) {
+  const router = useRouter();
   async function restockBook() {
     const result = await Swal.fire({
       title: "Restock Book",
@@ -83,6 +85,9 @@ export default function AdminControls({ book, fetchBooks }) {
         </button>
         <button
           id={book.id}
+          onClick={() => {
+            router.push(`/editBook/${book.id}`);
+          }}
           className="bg-yellow-500 text-white rounded px-4 py-2 hover:bg-yellow-600 transition duration-300"
         >
           Edit

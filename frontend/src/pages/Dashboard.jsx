@@ -79,7 +79,17 @@ function Dashboard() {
                 className="object-cover rounded-lg h-[20rem] w-[15rem]"
               />
             </div>
-            <h2 className="text-lg font-semibold mb-1">{book.title}</h2>
+            <h2
+              className="text-lg font-semibold mb-1"
+              style={{
+                maxWidth: "20rem",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {book.title}
+            </h2>
             <p className="text-gray-600">{book.author}</p>
             <p className="text-gray-500 text-sm mt-1">{book.description}</p>
             <p className="text-blue-500 mt-1">{book.category}</p>

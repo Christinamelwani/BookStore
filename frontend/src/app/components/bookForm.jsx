@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import InputField from "./inputField";
 
-export default function BookForm({ title, mode, onSubmit }) {
+export default function BookForm({ title, mode, onSubmit, inheritedBook }) {
   const [book, setBook] = useState({
     title: "",
     author: "",
@@ -10,6 +10,12 @@ export default function BookForm({ title, mode, onSubmit }) {
     price: "",
     stock: "",
   });
+
+  useEffect(() => {
+    if (inheritedBook) {
+      setBook(inheritedBook);
+    }
+  }, [inheritedBook]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -82,6 +88,7 @@ export default function BookForm({ title, mode, onSubmit }) {
           value={book.stock}
           required
         />
+        {/* Add the rest of your form fields here */}
         <div className="text-center">
           <button
             className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-full"
