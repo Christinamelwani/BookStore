@@ -1,49 +1,28 @@
 import { useRouter } from "next/router";
 import React from "react";
 import UserForm from "../components/userForm";
-import Swal from "sweetalert2";
+import { loginUser } from "../utils/api";
+import { displaySuccessAlert, displayErrorAlert } from "../utils/alerts";
 import Head from "next/head";
-
-const API_URL = "http://localhost:3000/user/login";
 
 export default function Login() {
   const router = useRouter();
 
   async function submitLoginForm(userData) {
     try {
-      const response = await fetch(API_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(userData),
-      });
+      const response = await loginUser(userData);
 
       if (response.ok) {
         const data = await response.json();
+        displaySuccessAlert("Successfully logged in");
         localStorage.setItem("access_token", data.access_token);
-
-        Swal.fire({
-          title: "Success!",
-          text: "Successfully logged in",
-          icon: "success",
-        });
-
         router.push("/");
       } else {
         const errorData = await response.json();
-        Swal.fire({
-          title: "Error",
-          text: errorData.message || "An error occurred",
-          icon: "error",
-        });
+        displayErrorAlert(errorData.message || "An error occurred");
       }
     } catch (error) {
-      Swal.fire({
-        title: "Error",
-        text: "An unexpected error occurred",
-        icon: "error",
-      });
+      displayErrorAlert("An unexpected error occurred");
     }
   }
 

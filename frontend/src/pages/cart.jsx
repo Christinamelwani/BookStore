@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "../components/navbar";
-import Swal from "sweetalert2";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
+import { fetchCartData, checkoutCartData } from "../utils/api.js";
+import {
+  displayErrorAlert,
+  displayConfirmationAlert,
+  displaySuccessAlert,
+} from "../utils/alerts.js";
 
 export default function Cart() {
   const [cart, setCart] = useState([]);
   const router = useRouter();
 
-  async function fetchCart() {
+  async function fetchAndSetCartData() {
     try {
-      const response = await fetch("http://localhost:3000/cart", {
-        headers: { access_token: localStorage.getItem("access_token") },
-      });
-      const data = await response.json();
+      const data = await fetchCartData();
 
       const cartData = data.data;
 
@@ -37,32 +39,30 @@ export default function Cart() {
 
       setCart(uniqueBooks);
     } catch (error) {
-      console.error("Error fetching user data:", error);
+      console.error("Error fetching cart data:", error);
+      displayErrorAlert("Error fetching cart data. Please try again later.");
     }
   }
 
-  async function checkoutCart() {
-    const answer = await Swal.fire({
-      title: "Are you sure you would like to checkout this cart?",
-      showDenyButton: true,
-      confirmButtonText: "Yes",
-      denyButtonText: "No",
-    });
+  async function handleCheckout() {
+    const confirmation = await displayConfirmationAlert(
+      "Are you sure you would like to checkout this cart?"
+    );
 
-    if (answer.isConfirmed) {
-      const response = await fetch("http://localhost:3000/cart", {
-        headers: { access_token: localStorage.getItem("access_token") },
-        method: "DELETE",
-      });
-      Swal.fire({
-        title: "Order placed!",
-      });
-      router.replace("/");
+    if (confirmation.isConfirmed) {
+      try {
+        await checkoutCartData();
+        displaySuccessAlert("Order placed!");
+        router.replace("/");
+      } catch (error) {
+        console.error("Error checking out cart:", error);
+        displayErrorAlert("Error checking out cart. Please try again later.");
+      }
     }
   }
 
   useEffect(() => {
-    fetchCart();
+    fetchAndSetCartData();
   }, []);
 
   return (
@@ -108,7 +108,7 @@ export default function Cart() {
             </div>
             {cart[0] ? (
               <button
-                onClick={checkoutCart}
+                onClick={handleCheckout}
                 className="px-4 py-2 bg-blue-500 text-white rounded-md"
               >
                 Checkout Cart

@@ -1,8 +1,9 @@
-import Navbar from "../components/navbar";
-import BookForm from "../components/bookForm";
-import Swal from "sweetalert2";
+import Navbar from "../../components/navbar";
+import BookForm from "../../components/bookForm";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { fetchBookData, editBookData } from "../../utils/api.js";
+import { displayErrorAlert, displaySuccessAlert } from "../../utils/alerts.js";
 
 export default function EditBook() {
   const router = useRouter();
@@ -14,32 +15,27 @@ export default function EditBook() {
     }
 
     try {
-      const response = await fetch(
-        `http://localhost:3000/book/${router.query.id}`
-      );
-      const data = await response.json();
-      setBook(data.data);
+      const data = await fetchBookData(router.query.id);
+      setBook(data);
     } catch (error) {
-      console.error("Error fetching books:", error);
+      console.error("Error fetching book data:", error);
+      displayErrorAlert("Error fetching book data. Please try again later.");
     }
   }
 
   async function submit(book) {
-    const response = await fetch(`http://localhost:3000/book/${book.id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(book),
-    });
+    try {
+      const response = await editBookData(book);
 
-    const data = await response.json();
-
-    if (data.status === 200) {
-      Swal.fire("Book successfully edited!");
-      router.push("/");
-    } else {
-      Swal.fire(data.message);
+      if (response.status === 200) {
+        displaySuccessAlert("Book successfully edited!");
+        router.push("/");
+      } else {
+        displayErrorAlert(response.message);
+      }
+    } catch (error) {
+      console.error("Error editing book:", error);
+      displayErrorAlert("Error editing book. Please try again later.");
     }
   }
 
@@ -53,19 +49,15 @@ export default function EditBook() {
 
   return (
     <div className="p-8 bg-gradient-to-b from-blue-100 to-blue-300 min-h-screen">
-      <Navbar
-        headerText="Edit Book"
-        link="/"
-        linkText="Back to Dashboard"
-      ></Navbar>
-      {book.title ? (
+      <Navbar headerText="Edit Book" link="/" linkText="Back to Dashboard" />
+      {book.title && (
         <BookForm
           title={`Edit "${book.title}"`}
           mode="Edit"
           onSubmit={submit}
           inheritedBook={book}
         />
-      ) : null}
+      )}
     </div>
   );
 }

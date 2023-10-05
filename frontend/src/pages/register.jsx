@@ -1,6 +1,7 @@
 import React from "react";
 import UserForm from "../components/userForm";
-import Swal from "sweetalert2";
+import { registerUser, loginUser } from "../utils/api";
+import { displaySuccessAlert, displayErrorAlert } from "../utils/alerts";
 import Head from "next/head";
 import { useRouter } from "next/router";
 
@@ -9,48 +10,30 @@ export default function Register() {
 
   async function submitRegisterForm(userData) {
     try {
-      const response = await fetch("http://localhost:3000/user/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(userData),
-      });
+      const response = await registerUser(userData);
 
       if (response.ok) {
-        Swal.fire({
-          title: "Success!",
-          text: "Successfully registered",
-          icon: "success",
-        });
+        displaySuccessAlert("Successfully registered");
 
-        const loginResponse = await fetch("http://localhost:3000/user/login", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(userData),
-        });
+        const loginResponse = await loginUser(userData);
 
-        const data = await loginResponse.json();
-        localStorage.setItem("access_token", data.access_token);
-
-        router.push("/");
+        if (loginResponse.ok) {
+          const data = await loginResponse.json();
+          localStorage.setItem("access_token", data.access_token);
+          router.push("/");
+        } else {
+          displayErrorAlert("Login Error", "An error occurred during login");
+        }
       } else {
         const errorData = await response.json();
-        Swal.fire({
-          title: "Error",
-          text: errorData.message || "An error occurred",
-          icon: "error",
-        });
+        displayErrorAlert(
+          "Registration Error",
+          errorData.message || "An error occurred"
+        );
       }
     } catch (error) {
       console.error("An error occurred while sending user data:", error);
-      Swal.fire({
-        title: "Error",
-        text: "An unexpected error occurred",
-        icon: "error",
-      });
+      displayErrorAlert("Error", "An unexpected error occurred");
     }
   }
 

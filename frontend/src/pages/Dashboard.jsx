@@ -2,33 +2,33 @@ import React, { useState, useEffect } from "react";
 import Navbar from "../components/navbar";
 import AdminControls from "../components/adminControls";
 import BookCounter from "../components/bookCounter";
+import { fetchUserData, fetchBooksData, fetchCartData } from "../utils/api.js";
 
 function Dashboard() {
   const [books, setBooks] = useState([]);
-  const [user, setUser] = useState([]);
+  const [user, setUser] = useState({});
   const [cart, setCart] = useState([]);
+  const [isAdmin, setIsAdmin] = useState(false);
 
-  const API_URL = "http://localhost:3000";
-
-  async function fetchData(url, setStateFunc) {
+  async function fetchData() {
     try {
-      const response = await fetch(url, {
-        headers: { access_token: localStorage.getItem("access_token") },
-      });
-      const data = await response.json();
-      setStateFunc(data.data);
+      const { data: userData } = await fetchUserData();
+      setUser(userData);
+      setIsAdmin(userData.isAdmin);
+
+      const { data: booksData } = await fetchBooksData();
+      setBooks(booksData);
+
+      const { data: cartData } = await fetchCartData();
+      setCart(cartData);
     } catch (error) {
-      console.error(`Error fetching data from ${url}:`, error);
+      console.error("Error fetching data:", error);
     }
   }
 
   useEffect(() => {
-    fetchData(`${API_URL}/book`, setBooks);
-    fetchData(`${API_URL}/user`, setUser);
-    fetchData(`${API_URL}/cart`, setCart);
+    fetchData();
   }, []);
-
-  const isAdmin = user.isAdmin;
 
   return (
     <div className="p-8 bg-gradient-to-b from-blue-100 to-blue-300 min-h-screen">
@@ -66,17 +66,9 @@ function Dashboard() {
               <p className="text-gray-600">Stock: {book.stock}</p>
             </div>
             {isAdmin ? (
-              <AdminControls
-                book={book}
-                fetchBooks={() => fetchData(`${API_URL}/book`, setBooks)}
-              />
+              <AdminControls book={book} fetchData={fetchData} />
             ) : (
-              <BookCounter
-                book={book}
-                cart={cart}
-                fetchBooks={() => fetchData(`${API_URL}/book`, setBooks)}
-                fetchCart={() => fetchData(`${API_URL}/cart`, setCart)}
-              />
+              <BookCounter book={book} cart={cart} fetchData={fetchData} />
             )}
           </div>
         ))}

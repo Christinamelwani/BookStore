@@ -1,37 +1,31 @@
 import Navbar from "../components/navbar";
 import BookForm from "../components/bookForm";
-import Swal from "sweetalert2";
 import { useRouter } from "next/router";
+import { addBookData } from "../utils/api.js";
+import { displayErrorAlert, displaySuccessAlert } from "../utils/alerts.js";
 
 export default function AddBook() {
   const router = useRouter();
 
   async function submit(book) {
-    const response = await fetch("http://localhost:3000/book", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(book),
-    });
+    try {
+      const response = await addBookData(book);
 
-    const data = await response.json();
-
-    if (data.status === 201) {
-      Swal.fire("Book successfully added!");
-      router.push("/");
-    } else {
-      Swal.fire(data.message);
+      if (response.status === 201) {
+        displaySuccessAlert("Book successfully added!");
+        router.push("/");
+      } else {
+        displayErrorAlert(response.message);
+      }
+    } catch (error) {
+      console.error("Error adding book:", error);
+      displayErrorAlert(error.message);
     }
   }
 
   return (
     <div className="p-8 bg-gradient-to-b from-blue-100 to-blue-300 min-h-screen">
-      <Navbar
-        headerText="Add Book"
-        link="/"
-        linkText="Back to Dashboard"
-      ></Navbar>
+      <Navbar headerText="Add Book" link="/" linkText="Back to Dashboard" />
       <BookForm title="Add a book" mode="Add" onSubmit={submit} />
     </div>
   );

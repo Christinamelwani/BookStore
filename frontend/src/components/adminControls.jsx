@@ -1,83 +1,65 @@
 import { useRouter } from "next/router";
-import Swal from "sweetalert2";
+import { restockBook, deleteBook } from "../utils/api";
+import {
+  displaySuccessAlert,
+  displayConfirmationAlert,
+  displayInputAlert,
+} from "../utils/alerts";
 
-export default function AdminControls({ book, fetchBooks }) {
+export default function AdminControls({ book, fetchData }) {
   const router = useRouter();
-  async function restockBook() {
-    const result = await Swal.fire({
-      title: "Restock Book",
-      text: `How many copies of ${book.title} would you like to restock?`,
-      input: "text",
-      showCancelButton: true,
-    });
 
-    if (!result.value) {
-      return;
-    }
-
-    const response = await fetch(
-      `http://localhost:3000/book/${book.id}/restock`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ stock: result.value }),
-      }
+  const restockBookHandler = async () => {
+    const result = await displayInputAlert(
+      `How many copies of ${book.title} do you want to restock?`
     );
 
-    const responseData = await response.json();
-
-    if (responseData.status === 200) {
-      Swal.fire({
-        text: "Successfully restocked!",
-        icon: "success",
-        timer: 1500,
-        timerProgressBar: true,
-      });
-      fetchBooks();
+    if (!result.value) {
+      return;
     }
-  }
 
-  async function deleteBook() {
-    const result = await Swal.fire({
-      text: `Are you sure you want to delete ${book.title}?`,
-      confirmButtonText: "Yes",
-      confirmButtonColor: "#e3342f",
-      cancelButtonText: "No",
-      showCancelButton: true,
-      icon: "question",
-    });
+    try {
+      const responseData = await restockBook(book, result.value);
+
+      if (responseData.status === 200) {
+        displaySuccessAlert("Successfully restocked!");
+        fetchData();
+      } else {
+        displayErrorAlert("Failed to restock.");
+      }
+    } catch (error) {
+      displayErrorAlert("Network error. Please try again later.");
+    }
+  };
+
+  const deleteBookHandler = async () => {
+    const result = await displayConfirmationAlert(
+      `Are you sure you want to delete ${book.title}?`
+    );
 
     if (!result.value) {
       return;
     }
 
-    const response = await fetch(`http://localhost:3000/book/${book.id}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    try {
+      const responseData = await deleteBook(book);
 
-    const responseData = await response.json();
-
-    if (responseData.status === 200) {
-      Swal.fire({
-        text: "Successfully deleted!",
-        icon: "success",
-        timer: 1500,
-        timerProgressBar: true,
-      });
-      fetchBooks();
+      if (responseData.status === 200) {
+        displaySuccessAlert("Successfully deleted!");
+        fetchData();
+      } else {
+        displayErrorAlert("Failed to delete.");
+      }
+    } catch (error) {
+      displayErrorAlert("Network error. Please try again later.");
     }
-  }
+  };
 
   return (
     <div className="flex items-center py-4">
       <div className="flex items-center justify-between gap-5 px-10">
         <button
-          onClick={restockBook}
+          onClick={restockBookHandler}
           id={book.id}
           className="bg-green-500 text-white rounded px-4 py-2 hover:bg-green-600 transition duration-300"
         >
@@ -93,7 +75,7 @@ export default function AdminControls({ book, fetchBooks }) {
           Edit
         </button>
         <button
-          onClick={deleteBook}
+          onClick={deleteBookHandler}
           id={book.id}
           className="bg-red-500 text-white rounded px-4 py-2 hover:bg-red-600 transition duration-300"
         >
