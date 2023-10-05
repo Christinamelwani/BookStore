@@ -1,12 +1,15 @@
+// Cart.js
 import React, { useState, useEffect } from "react";
-import Navbar from "../components/navbar";
+import Navbar from "@/components/navbar";
 import { useRouter } from "next/router";
-import { fetchCartData, checkoutCartData } from "../utils/api.js";
+import { fetchCartData, checkoutCartData } from "@/utils/api.js";
 import {
   displayErrorAlert,
   displayConfirmationAlert,
   displaySuccessAlert,
-} from "../utils/alerts.js";
+} from "@/utils/alerts.js";
+import CartItem from "@/components/CartItem";
+import CartSummary from "@/components/CartSummary";
 
 export default function Cart() {
   const [cart, setCart] = useState([]);
@@ -70,54 +73,9 @@ export default function Cart() {
       <Navbar headerText="Cart" link="/" linkText="Back to Dashboard" />
       <div className="flex flex-col items-center space-y-4">
         {cart.map((book) => (
-          <div
-            key={book.id}
-            className="bg-white w-full lg:w-[40%] p-4 rounded-lg shadow-md"
-          >
-            <div className="flex flex-col lg:flex-row justify-between items-center">
-              <div>
-                <h2 className="text-lg font-semibold">{book.title}</h2>
-                <p className="text-gray-500">{book.author}</p>
-              </div>
-              <div className="lg:text-blue-500">
-                Total price:{" "}
-                {new Intl.NumberFormat("id-ID", {
-                  style: "currency",
-                  currency: "IDR",
-                }).format(book.price * book.count)}
-              </div>
-            </div>
-            <div className="text-blue-500">Quantity: {book.count}</div>
-          </div>
+          <CartItem key={book.id} book={book} />
         ))}
-        <div className="bg-white w-full lg:w-[40%] p-4 rounded-lg shadow-md">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center">
-              <h2 className="text-lg font-semibold">Total price:</h2>
-              <p className="lg:text-blue-500 ml-2">
-                {new Intl.NumberFormat("id-ID", {
-                  style: "currency",
-                  currency: "IDR",
-                }).format(
-                  cart.reduce(
-                    (total, book) => (total += book.price * book.count),
-                    0
-                  )
-                )}
-              </p>
-            </div>
-            {cart[0] ? (
-              <button
-                onClick={handleCheckout}
-                className="px-4 py-2 bg-blue-500 text-white rounded-md"
-              >
-                Checkout Cart
-              </button>
-            ) : (
-              <div className="text-blue-500">Nothing in your cart yet</div>
-            )}
-          </div>
-        </div>
+        <CartSummary cart={cart} onCheckout={handleCheckout} />
       </div>
     </div>
   );
