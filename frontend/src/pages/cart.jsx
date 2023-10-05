@@ -1,4 +1,3 @@
-// Cart.js
 import React, { useState, useEffect } from "react";
 import Navbar from "@/components/navbar";
 import { useRouter } from "next/router";
@@ -8,8 +7,8 @@ import {
   displayConfirmationAlert,
   displaySuccessAlert,
 } from "@/utils/alerts.js";
-import CartItem from "@/components/CartItem";
-import CartSummary from "@/components/CartSummary";
+import CartItem from "@/components/cartItem";
+import CartSummary from "@/components/cartSummary";
 
 export default function Cart() {
   const [cart, setCart] = useState([]);

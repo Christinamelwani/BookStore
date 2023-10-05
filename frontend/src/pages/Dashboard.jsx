@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "../components/navbar";
-import BookCard from "../components/BookCard"; // Import the BookCard component
+import BookCard from "../components/bookCard";
 import { fetchUserData, fetchBooksData, fetchCartData } from "../utils/api.js";
 import { displayErrorAlert } from "@/utils/alerts";
 
