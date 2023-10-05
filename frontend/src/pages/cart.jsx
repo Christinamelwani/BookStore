@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import "@/app/globals.css";
-import Navbar from "@/app/components/navbar";
+import Navbar from "../components/navbar";
 import Swal from "sweetalert2";
 import { useRouter } from "next/navigation";
 
@@ -51,17 +50,13 @@ export default function Cart() {
     });
 
     if (answer.isConfirmed) {
-      // Create a transaction
-      // Empty cart
       const response = await fetch("http://localhost:3000/cart", {
         headers: { access_token: localStorage.getItem("access_token") },
         method: "DELETE",
       });
-      // Alert that a transaction has been created
       Swal.fire({
         title: "Order placed!",
       });
-      // Redirect back to dashboard
       router.replace("/");
     }
   }

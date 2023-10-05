@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import React from "react";
-import UserForm from "@/app/components/userForm";
+import UserForm from "../components/userForm";
 import Swal from "sweetalert2";
 import Head from "next/head";
 

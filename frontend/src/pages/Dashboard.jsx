@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
-import "@/app/globals.css";
-import Navbar from "@/app/components/navbar";
-import AdminControls from "./adminControls";
-import BookCounter from "./bookCounter";
+import Navbar from "../components/navbar";
+import AdminControls from "../components/adminControls";
+import BookCounter from "../components/bookCounter";
 
 function Dashboard() {
   const [books, setBooks] = useState([]);

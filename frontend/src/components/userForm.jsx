@@ -1,4 +1,3 @@
-import "@/app/globals.css";
 import { useState } from "react";
 import InputField from "./inputField";
 import SubmitButton from "./submitButton";

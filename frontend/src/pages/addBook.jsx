@@ -1,6 +1,5 @@
-import "@/app/globals.css";
-import Navbar from "@/app/components/navbar";
-import BookForm from "@/app/components/bookForm";
+import Navbar from "../components/navbar";
+import BookForm from "../components/bookForm";
 import Swal from "sweetalert2";
 import { useRouter } from "next/router";
 
